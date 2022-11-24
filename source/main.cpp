@@ -1,7 +1,7 @@
 #include "rawSocket.hpp"
 
 int main(){
-  woXrooX::RawSocket::start();
+  woXrooX::Spotlight::start();
 
   return 0;
 }
