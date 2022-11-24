@@ -1,2 +1,17 @@
 Protocol Numbers
-6   TCP
+  6   TCP
+
+
+packet(7) — Linux manual page
+  https://man7.org/linux/man-pages/man7/packet.7.html
+
+AF_INET vs PF_INET
+  https://www.linuxquestions.org/questions/programming-9/sockets-af_packet-versus-pf_packet-942143/
+
+  AF_foo means address family foo, and PF_foo means protocol family foo.
+  In Linux, they are always been the same values,
+  I believe. Traditionally, the PF_foo constants were used for socket(),
+  but AF_foo in the struct sockaddr structure.
+  According to man 2 socket, even the (historical) BSD 4.x manpage states that "The protocol family generally is the same as the address family",
+  and subsequent standards use AF_* everywhere.
+  Thus, today, there really should be no difference between AF_foo and PF_foo.
