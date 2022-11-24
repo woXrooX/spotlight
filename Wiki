@@ -1,6 +1,8 @@
-Protocol Numbers
-  6   TCP
+Socket
+  int socket(int domain, int type, int protocol);
 
+Protocol Numbers
+  6   TCP   IPPROTO_TCP
 
 packet(7) — Linux manual page
   https://man7.org/linux/man-pages/man7/packet.7.html
