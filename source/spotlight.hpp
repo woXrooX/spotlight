@@ -5,7 +5,7 @@
 #include <netinet/in.h>       // socket & AF_PACKET & SOCK_RAW & IPPROTO_TCP
 #include <unistd.h>           // read
 #include <net/ethernet.h>     // ETH_P_ALL
-#include <netinet/ip.h>       // struct iphdr -> Unix-Like
+// #include <netinet/ip.h>       // struct iphdr -> Unix-Like
 // #include <linux/ip.h>         // struct iphdr -> Linux
 
 // #include <linux/if_packet.h>
@@ -35,6 +35,7 @@ namespace woXrooX{
       // All Protocols -> htons(ETH_P_ALL)
       Spotlight::fd_socket = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_ALL));
       // Spotlight::fd_socket = socket(AF_INET, SOCK_RAW, IPPROTO_TCP);
+
       if(Spotlight::fd_socket < 0) std::cout << "\033[40;31m" << "Failed To Create Socket Descriptor." << "\033[0m\n";
       else std::cout << "\033[1;32m" << "Socket Descriptor Created Successfully." << "\033[0m\n";
 
@@ -66,18 +67,22 @@ namespace woXrooX{
 
     }
 
-    // void ProcessPacket(unsigned char* buffer, int size){
     static void processPacket(unsigned char* inData, int size){
+      // If you get 0x800 (ETH_P_IP), it means that the next header is the IP header. Later, we will consider the next header as the IP header
 
-      // https://stackoverflow.com/questions/42840636/difference-between-struct-ip-and-struct-iphdr
-      // IP Header
-      struct iphdr *iph = (struct iphdr*)inData;
+      // Ethernet Header
+      struct ethhdr *eth = (struct ethhdr*)inData;
+
+      // printf("\nEthernet Header\n");
+      // printf("\t|-Source Address : %.2X-%.2X-%.2X-%.2X-%.2X-%.2X\n",eth->h_source[0],eth->h_source[1],eth->h_source[2],eth->h_source[3],eth->h_source[4],eth->h_source[5]);
+      // printf("\t|-Destination Address : %.2X-%.2X-%.2X-%.2X-%.2X-%.2X\n",eth->h_dest[0],eth->h_dest[1],eth->h_dest[2],eth->h_dest[3],eth->h_dest[4],eth->h_dest[5]);
+      // printf("\t|-Protocol : %d\n",eth->h_proto);
 
       // Total Connections
       Spotlight::total++;
 
       // Individual Connections / Protocols
-      switch(iph->protocol){
+      switch(eth->h_proto){
         case 1: // ICMP
           Spotlight::ICMP++;
           break;
@@ -90,8 +95,15 @@ namespace woXrooX{
           Spotlight::TCP++;
           break;
 
+        case 8: // EGP
+          Spotlight::EGP++;
+          break;
+
         case 17: // UDP
           Spotlight::UDP++;
+          break;
+
+        case 2048: // 0x800 = 2048
           break;
 
         default:
@@ -106,6 +118,7 @@ namespace woXrooX{
       << "ICMP: "       << Spotlight::ICMP
       << "\nIGMP: "     << Spotlight::IGMP
       << "\nTCP: "      << Spotlight::TCP
+      << "\nEGP: "      << Spotlight::EGP
       << "\nUDP: "      << Spotlight::UDP
       << "\nTotal: "    << Spotlight::total
       << "\nUnknown: "  << Spotlight::unknown
@@ -113,14 +126,15 @@ namespace woXrooX{
 
     }
 
-    static void printIpHeader(){
+    static void ipHeader(){
+      // struct iphdr *iph = (struct iphdr*)inData;
 
     }
 
     ///////// Variables
     // Counts
     static int total, unknown;
-    static int ICMP, IGMP, TCP, UDP;
+    static int ICMP, IGMP, TCP, EGP, UDP;
 
     static int fd_socket;
     static int bytes_received;
@@ -133,6 +147,7 @@ namespace woXrooX{
   int Spotlight::ICMP = 0;
   int Spotlight::IGMP = 0;
   int Spotlight::TCP = 0;
+  int Spotlight::EGP = 0;
   int Spotlight::UDP = 0;
 
   int Spotlight::fd_socket = -1;
