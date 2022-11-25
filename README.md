@@ -1,2 +1,2 @@
 # Spotlight
-*Tool for monitoring all kinds of I/Os in Unix-like operating systems.*
+*Tool for monitoring all kinds of I/Os in Unix-like operating systems. (I/O Sniffer)*
