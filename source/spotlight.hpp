@@ -16,7 +16,7 @@ namespace woXrooX{
   class Spotlight final{
   public:
     static void observe(){
-      std::cout << "\033[1;33mStarting...\033[0m" << '\n';
+      std::cout << "\033[1;33m" << "Starting..." << "\033[0m\n";
       Spotlight::create_socket();
 
       while(true){
@@ -32,8 +32,8 @@ namespace woXrooX{
       // IPPROTO_TCP
       // All Protocols -> htons(ETH_P_ALL)
       Spotlight::fd_socket = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_ALL));
-      if(Spotlight::fd_socket == -1) std::cout << "\033[1;31mFailed To Create Socket Descriptor.\033[0m" << '\n';
-      else std::cout << "\033[0;32mSocket Descriptor Created Successfully.\033[0m" << '\n';
+      if(Spotlight::fd_socket < 0) std::cout << "\033[40;31m" << "Failed To Create Socket Descriptor." << "\033[0m\n";
+      else std::cout << "\033[1;32m" << "Socket Descriptor Created Successfully." << "\033[0m\n";
 
     }
 
@@ -49,10 +49,10 @@ namespace woXrooX{
         received_data_size += Spotlight::bytes_received;
 
         // if(received_data_size > Spotlight::BUFFER_SIZE-1 || inData[Spotlight::BUFFER_SIZE-1] == '\n') break;
-        if(Spotlight::bytes_received == -1){std::cout << "Failed To Receive Data." << '\n'; return;}
-        if(Spotlight::bytes_received == 0){std::cout << "End Of The Line" << '\n'; break;}
+        if(Spotlight::bytes_received == -1){std::cout << "\033[40;31m" << "Failed To Receive Data." << "\033[0m\n"; return;}
+        if(Spotlight::bytes_received == 0){std::cout << "\033[40;33m" << "End Of The Line" << "\033[0m\n"; break;}
         if(Spotlight::bytes_received > 0){
-          std::cout <<  "Data Received Successfully" << '\n';
+          std::cout << "\033[40;94m" << "Data Received Successfully!" << "\033[0m\n";
           std::cout << inData << '\n';
           break;
         }
