@@ -17,3 +17,10 @@ AF_INET vs PF_INET
   According to man 2 socket, even the (historical) BSD 4.x manpage states that "The protocol family generally is the same as the address family",
   and subsequent standards use AF_* everywhere.
   Thus, today, there really should be no difference between AF_foo and PF_foo.
+
+
+Hexdump
+  for (int i=0; i<Spotlight::BUFFER_SIZE; i++) {
+    printf("%06x ", inData[i]);
+    printf(" ");
+  }
