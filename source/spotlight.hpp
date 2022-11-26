@@ -156,20 +156,13 @@ namespace woXrooX{
 
       // Source Address
       std::cout << "Source Address: ";
-      for(std::size_t i = 0; i < 6; i++){
-        std::cout
-          << Spotlight::intToString(source[i])
-          << ((i != 5) ? '-' : '\n');
-      }
+      Spotlight::loopETHAdresses(source);
 
       // Destination Address
       std::cout << "Destination Address: ";
-      for(std::size_t i = 0; i < 6; i++){
-        std::cout
-          << Spotlight::intToString(destination[i])
-          << ((i != 5) ? '-' : '\n');
-      }
+      Spotlight::loopETHAdresses(destination);
 
+      // Protocol
       std::cout << "Protocol: " << protocol << '\n';
 
     }
@@ -200,6 +193,15 @@ namespace woXrooX{
         << (int)data;
 
         return stream.str();
+
+    }
+
+    static void loopETHAdresses(unsigned char addresses[6]){
+      for(std::size_t i = 0; i < 6; i++){
+        std::cout
+          << Spotlight::intToString(addresses[i])
+          << ((i != 5) ? '-' : '\n');
+      }
 
     }
 
