@@ -153,27 +153,24 @@ namespace woXrooX{
     ////// Outs
     static void outETH(int protocol, unsigned char source[6], unsigned char destination[6]){
       std::cout << "Ethernet Header" << '\n';
-      std::cout
-        << "Source Address: "
-        << Spotlight::intToString(source[0])
-        << Spotlight::intToString(source[1])
-        << Spotlight::intToString(source[2])
-        << Spotlight::intToString(source[3])
-        << Spotlight::intToString(source[4])
-        << Spotlight::intToString(source[5])
-        << '\n';
 
-      std::cout
-        << "Destination Address: "
-        << Spotlight::intToString(destination[0])
-        << Spotlight::intToString(destination[1])
-        << Spotlight::intToString(destination[2])
-        << Spotlight::intToString(destination[3])
-        << Spotlight::intToString(destination[4])
-        << Spotlight::intToString(destination[5])
-        << '\n';
+      // Source Address
+      std::cout << "Source Address: ";
+      for(std::size_t i = 0; i < 6; i++){
+        std::cout
+          << Spotlight::intToString(source[i])
+          << ((i != 5) ? '-' : '\n');
+      }
 
-        std::cout << "Protocol: " << protocol << '\n';
+      // Destination Address
+      std::cout << "Destination Address: ";
+      for(std::size_t i = 0; i < 6; i++){
+        std::cout
+          << Spotlight::intToString(destination[i])
+          << ((i != 5) ? '-' : '\n');
+      }
+
+      std::cout << "Protocol: " << protocol << '\n';
 
     }
 
@@ -200,8 +197,7 @@ namespace woXrooX{
         << std::setfill('0')
         << std::setw(2)
         << std::uppercase
-        << (int)data
-        << '-';
+        << (int)data;
 
         return stream.str();
 
