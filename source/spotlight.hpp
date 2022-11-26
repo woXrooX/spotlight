@@ -2,14 +2,16 @@
 #define SPOTLIGHT_H
 
 #include <iostream>
-#include <netinet/in.h>       // socket & AF_PACKET & SOCK_RAW & IPPROTO_TCP
 #include <unistd.h>           // read
+
+#include <netinet/in.h>       // socket & AF_PACKET & SOCK_RAW & IPPROTO_TCP
+#include <arpa/inet.h>        // inet_ntoa
+
 #include <net/ethernet.h>     // ETH_P_ALL
-// #include <netinet/ip.h>       // struct iphdr -> Unix-Like
+#include <netinet/ip.h>       // struct iphdr -> Unix-Like
 // #include <linux/ip.h>         // struct iphdr -> Linux
 
 // #include <linux/if_packet.h>
-// #include <arpa/inet.h>
 // #include <sys/socket.h>
 // #include <netinet/tcp.h>
 // #include <sys/types.h>
@@ -71,7 +73,7 @@ namespace woXrooX{
       // If you get 0x800 (ETH_P_IP), it means that the next header is the IP header. Later, we will consider the next header as the IP header
 
       // Ethernet Header
-      struct ethhdr *eth = (struct ethhdr*)inData;
+      // struct ethhdr *eth = (struct ethhdr*)inData;
 
       // printf("\nEthernet Header\n");
       // printf("\t|-Source Address : %.2X-%.2X-%.2X-%.2X-%.2X-%.2X\n",eth->h_source[0],eth->h_source[1],eth->h_source[2],eth->h_source[3],eth->h_source[4],eth->h_source[5]);
@@ -82,7 +84,45 @@ namespace woXrooX{
       Spotlight::total++;
 
       // Individual Connections / Protocols
-      switch(eth->h_proto){
+      // switch(eth->h_proto){
+      //   case 1: // ICMP
+      //     Spotlight::ICMP++;
+      //     break;
+      //
+      //   case 2: // IGMP
+      //     Spotlight::IGMP++;
+      //     break;
+      //
+      //   case 6: // TCP
+      //     Spotlight::TCP++;
+      //     break;
+      //
+      //   case 8: // EGP
+      //     Spotlight::EGP++;
+      //     break;
+      //
+      //   case 17: // UDP
+      //     Spotlight::UDP++;
+      //     break;
+      //
+      //   case 2048: // 0x800 = 2048
+      //     break;
+      //
+      //   default:
+      //     Spotlight::unknown++;
+      //     break;
+      //
+      // }
+
+      Spotlight::ipHeader(inData);
+
+    }
+
+    static void ipHeader(unsigned char* inData){
+      // struct iphdr *iph = (struct iphdr*)inData;
+      struct iphdr *iph = (struct iphdr*)(inData + sizeof(struct ethhdr));
+
+      switch(iph->protocol){
         case 1: // ICMP
           Spotlight::ICMP++;
           break;
@@ -103,15 +143,38 @@ namespace woXrooX{
           Spotlight::UDP++;
           break;
 
-        case 2048: // 0x800 = 2048
-          break;
-
         default:
           Spotlight::unknown++;
           break;
 
       }
 
+      std::cout << "IP Version: " << (unsigned int)iph->version << '\n';
+
+      std::cout << "Internet Header Length:" << '\n';
+      std::cout << "DWORDS: " << (iph->ihl) << '\n';
+      std::cout << "Bytes: " << ((iph->ihl)*4) << '\n';
+
+      std::cout << "Type Of Service: " << (unsigned int)iph->tos << '\n';
+
+      std::cout << "Total Length (Bytes): " << ntohs(iph->tot_len) << '\n';
+
+      std::cout << "Identification: " << ntohs(iph->id) << '\n';
+
+      std::cout << "Header Checksum: " << ntohs(iph->check) << '\n';
+
+      // uint32 To Human Readable
+      struct in_addr ip_source;
+      ip_source.s_addr = iph->saddr;
+      struct in_addr ip_destination;
+      ip_destination.s_addr = iph->daddr;
+
+      std::cout << "Source IP: " << inet_ntoa(ip_source) << '\n';
+      std::cout << "Destination IP: " << inet_ntoa(ip_destination) << '\n';
+
+    }
+
+    void out(){
       std::cout
       << "\x1b[2J"    // Clear Entire Terminal
       << "\x1b[1;1f"  // Move Cursor To 1:1
@@ -123,11 +186,6 @@ namespace woXrooX{
       << "\nTotal: "    << Spotlight::total
       << "\nUnknown: "  << Spotlight::unknown
       << '\n';
-
-    }
-
-    static void ipHeader(){
-      // struct iphdr *iph = (struct iphdr*)inData;
 
     }
 
