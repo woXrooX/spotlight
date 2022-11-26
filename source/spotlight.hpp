@@ -2,6 +2,8 @@
 #define SPOTLIGHT_H
 
 #include <iostream>
+#include <iomanip>            // std::setfill
+// #include <format>             // std::format
 #include <unistd.h>           // read
 
 #include <netinet/in.h>       // socket & AF_PACKET & SOCK_RAW & IPPROTO_TCP
@@ -73,48 +75,28 @@ namespace woXrooX{
       // If you get 0x800 (ETH_P_IP), it means that the next header is the IP header. Later, we will consider the next header as the IP header
 
       // Ethernet Header
-      // struct ethhdr *eth = (struct ethhdr*)inData;
-
-      // printf("\nEthernet Header\n");
-      // printf("\t|-Source Address : %.2X-%.2X-%.2X-%.2X-%.2X-%.2X\n",eth->h_source[0],eth->h_source[1],eth->h_source[2],eth->h_source[3],eth->h_source[4],eth->h_source[5]);
-      // printf("\t|-Destination Address : %.2X-%.2X-%.2X-%.2X-%.2X-%.2X\n",eth->h_dest[0],eth->h_dest[1],eth->h_dest[2],eth->h_dest[3],eth->h_dest[4],eth->h_dest[5]);
-      // printf("\t|-Protocol : %d\n",eth->h_proto);
+      struct ethhdr *eth = (struct ethhdr*)inData;
 
       // Total Connections
       Spotlight::total++;
 
       // Individual Connections / Protocols
-      // switch(eth->h_proto){
-      //   case 1: // ICMP
-      //     Spotlight::ICMP++;
-      //     break;
-      //
-      //   case 2: // IGMP
-      //     Spotlight::IGMP++;
-      //     break;
-      //
-      //   case 6: // TCP
-      //     Spotlight::TCP++;
-      //     break;
-      //
-      //   case 8: // EGP
-      //     Spotlight::EGP++;
-      //     break;
-      //
-      //   case 17: // UDP
-      //     Spotlight::UDP++;
-      //     break;
-      //
-      //   case 2048: // 0x800 = 2048
-      //     break;
-      //
-      //   default:
-      //     Spotlight::unknown++;
-      //     break;
-      //
-      // }
+      switch(eth->h_proto){
+        case 8: // EGP
+          Spotlight::EGP++;
+          break;
 
-      Spotlight::ipHeader(inData);
+        default:
+          Spotlight::unknown++;
+          break;
+
+      }
+
+
+
+      // Spotlight::ipHeader(inData);
+      Spotlight::outETH(eth->h_proto, eth->h_source, eth->h_dest);
+      // Spotlight::outIPH();
 
     }
 
@@ -174,7 +156,32 @@ namespace woXrooX{
 
     }
 
-    void out(){
+    static void outETH(int protocol, unsigned char source[6], unsigned char destination[6]){
+      std::cout << "Ethernet Header" << '\n';
+      std::cout
+        << "Source Address: "
+        << Spotlight::intToString(source[0])
+        << Spotlight::intToString(source[1])
+        << Spotlight::intToString(source[2])
+        << Spotlight::intToString(source[3])
+        << Spotlight::intToString(source[4])
+        << Spotlight::intToString(source[5])
+        << '\n';
+
+      std::cout
+        << "Destination Address: "
+        << Spotlight::intToString(destination[0])
+        << Spotlight::intToString(destination[1])
+        << Spotlight::intToString(destination[2])
+        << Spotlight::intToString(destination[3])
+        << Spotlight::intToString(destination[4])
+        << Spotlight::intToString(destination[5])
+        << '\n';
+
+        std::cout << "Protocol: " << protocol << '\n';
+
+    }
+    static void outIPH(){
       std::cout
       << "\x1b[2J"    // Clear Entire Terminal
       << "\x1b[1;1f"  // Move Cursor To 1:1
@@ -189,8 +196,22 @@ namespace woXrooX{
 
     }
 
+    static std::string intToString(unsigned char data){
+      std::stringstream stream;
+      stream
+        << std::hex
+        << std::setfill('0')
+        << std::setw(2)
+        << std::uppercase
+        << (int)data
+        << '-';
+
+        return stream.str();
+
+    }
+
     ///////// Variables
-    // Counts
+    // Counters
     static int total, unknown;
     static int ICMP, IGMP, TCP, EGP, UDP;
 
