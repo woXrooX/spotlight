@@ -25,20 +25,15 @@ namespace woXrooX{
       std::cout << "\033[1;33m" << "Starting..." << "\033[0m\n";
       Spotlight::create_socket();
 
-      while(true){
-        Spotlight::in();
-
-      }
+      // Move The Loop Inside in
+      while(true) Spotlight::in();
 
     }
 
   private:
     static void create_socket(){
-      // 0 indicates that the caller does not want to specify the protocol and will leave it up to the service provider.
-      // IPPROTO_TCP
       // All Protocols -> htons(ETH_P_ALL)
       Spotlight::fd_socket = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_ALL));
-      // Spotlight::fd_socket = socket(AF_INET, SOCK_RAW, IPPROTO_TCP);
 
       if(Spotlight::fd_socket < 0) std::cout << "\033[40;31m" << "Failed To Create Socket Descriptor." << "\033[0m\n";
       else std::cout << "\033[1;32m" << "Socket Descriptor Created Successfully." << "\033[0m\n";
@@ -71,6 +66,7 @@ namespace woXrooX{
 
     }
 
+    ////// Processes
     static void processPacket(unsigned char* inData, int size){
       // If you get 0x800 (ETH_P_IP), it means that the next header is the IP header. Later, we will consider the next header as the IP header
 
@@ -92,16 +88,14 @@ namespace woXrooX{
 
       }
 
-
-
-      // Spotlight::ipHeader(inData);
+      // Spotlight::processIPH(inData);
       Spotlight::outETH(eth->h_proto, eth->h_source, eth->h_dest);
       // Spotlight::outIPH();
 
     }
 
-    static void ipHeader(unsigned char* inData){
-      // struct iphdr *iph = (struct iphdr*)inData;
+    static void processIPH(unsigned char* inData){
+      // IP Header
       struct iphdr *iph = (struct iphdr*)(inData + sizeof(struct ethhdr));
 
       switch(iph->protocol){
@@ -156,6 +150,7 @@ namespace woXrooX{
 
     }
 
+    ////// Outs
     static void outETH(int protocol, unsigned char source[6], unsigned char destination[6]){
       std::cout << "Ethernet Header" << '\n';
       std::cout
@@ -181,6 +176,7 @@ namespace woXrooX{
         std::cout << "Protocol: " << protocol << '\n';
 
     }
+
     static void outIPH(){
       std::cout
       << "\x1b[2J"    // Clear Entire Terminal
@@ -196,6 +192,7 @@ namespace woXrooX{
 
     }
 
+    ////// Helpers
     static std::string intToString(unsigned char data){
       std::stringstream stream;
       stream
@@ -221,6 +218,7 @@ namespace woXrooX{
 
   };
 
+  // Counters
   int Spotlight::total = 0;
   int Spotlight::unknown = 0;
   int Spotlight::ICMP = 0;
@@ -231,8 +229,8 @@ namespace woXrooX{
 
   int Spotlight::fd_socket = -1;
   int Spotlight::bytes_received = 0;
-  // int Spotlight::BUFFER_SIZE = 512;
-  int Spotlight::BUFFER_SIZE = 262144; // 512kb | 256kb
+  int Spotlight::BUFFER_SIZE = 262144; // 256kb
 
 }
+
 #endif
