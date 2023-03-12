@@ -22,6 +22,8 @@ namespace woXrooX{
   class Spotlight final{
   public:
     static void observe(){
+      Spotlight::brand();
+
       std::cout << "\033[1;33m" << "Starting..." << "\033[0m\n";
       Spotlight::create_socket();
 
@@ -88,9 +90,9 @@ namespace woXrooX{
 
       }
 
-      // Spotlight::processIPH(inData);
-      Spotlight::outETH(eth->h_proto, eth->h_source, eth->h_dest);
-      // Spotlight::outIPH();
+      // Spotlight::outETH(eth->h_proto, eth->h_source, eth->h_dest);
+      Spotlight::processIPH(inData);
+      // Spotlight::outCounters();
 
     }
 
@@ -125,7 +127,35 @@ namespace woXrooX{
 
       }
 
+      Spotlight::outIPH(iph);
+
+      delete iph;
+
+    }
+
+    ////// Outs
+    static void outETH(int protocol, unsigned char source[6], unsigned char destination[6]){
+      std::cout << "Ethernet Header" << '\n';
+
+      // Source Address
+      std::cout << "Source Address: ";
+      Spotlight::loopETHAdresses(source);
+
+      // Destination Address
+      std::cout << "Destination Address: ";
+      Spotlight::loopETHAdresses(destination);
+
+      // Protocol
+      std::cout << "Protocol: " << protocol << '\n';
+
+    }
+
+    static void outIPH(struct iphdr *iph){
+      std::cout << "IP Header" << '\n';
+
       std::cout << "IP Version: " << (unsigned int)iph->version << '\n';
+
+      std::cout << "Protocol: " << (unsigned int)iph->protocol << '\n';
 
       std::cout << "Internet Header Length:" << '\n';
       std::cout << "DWORDS: " << (iph->ihl) << '\n';
@@ -148,26 +178,11 @@ namespace woXrooX{
       std::cout << "Source IP: " << inet_ntoa(ip_source) << '\n';
       std::cout << "Destination IP: " << inet_ntoa(ip_destination) << '\n';
 
-    }
-
-    ////// Outs
-    static void outETH(int protocol, unsigned char source[6], unsigned char destination[6]){
-      std::cout << "Ethernet Header" << '\n';
-
-      // Source Address
-      std::cout << "Source Address: ";
-      Spotlight::loopETHAdresses(source);
-
-      // Destination Address
-      std::cout << "Destination Address: ";
-      Spotlight::loopETHAdresses(destination);
-
-      // Protocol
-      std::cout << "Protocol: " << protocol << '\n';
+      delete iph;
 
     }
 
-    static void outIPH(){
+    static void outCounters(){
       std::cout
       << "\x1b[2J"    // Clear Entire Terminal
       << "\x1b[1;1f"  // Move Cursor To 1:1
@@ -202,6 +217,17 @@ namespace woXrooX{
           << Spotlight::intToString(addresses[i])
           << ((i != 5) ? '-' : '\n');
       }
+
+    }
+
+    static void brand(){
+      std::cout
+        << "\x1b[2J"              // Clear Entire Terminal
+        << "\x1b[1;1f"            // Move Cursor To 1:1
+        << "\033[1;40;36m"        // FG Color
+        << "--- Spotlight ---"
+        << "\x1b[0m"              // Reset Color
+        << '\n';
 
     }
 
