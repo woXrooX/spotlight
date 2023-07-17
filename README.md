@@ -5,4 +5,4 @@
 
 **Tested On GCC/Machine:** *g++ (Ubuntu 11.3.0-1ubuntu1~22.04) 11.3.0*
 
-**For The Memes:** I Like Reinventing The Wheel :)
+**For The Memes:** I Like Reinventing The Wheel:)
